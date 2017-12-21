@@ -1,0 +1,155 @@
+C51 COMPILER V9.01   MAIN                                                                  06/26/2015 09:26:00 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE MAIN
+OBJECT MODULE PLACED IN MAIN.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE MAIN.C OPTIMIZE(6,SPEED) BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          /*
+   2          ±¾²âÊÔ³ÌÐòÔÚ°²ÐÅ¿É¿Æ¼¼50Ôª µÄ´ó²âÊÔ°åÉÏÕýÈ·ÔËÐÐ£¬ËùÓÐ°²ÐÅ¿É³öµÄµÄÄ£¿é´ÓESP-01µ½ESP-14¾ù¿ÉÒÔÕýÈ·ÔËÐÐ£¬ÓëÔ¶³
+             -Ì¿ØÖÆ¡£
+   3          */
+   4          #include"SYS.H"
+   5          #include"AT_PRC.H"
+   6          #include"delay.h"
+   7          void main(void)
+   8          {
+   9   1              char tt,n,z=0;
+  10   1              unsigned int h=0;
+  11   1              BEEP=0;
+  12   1              //////////////////////////////////////////////////////////////////////////////////////ÏÂÃæ²¿·ÖÎª¶¨Ê±Æ÷ÒÔ¼
+             -°´®¿Ú³õÊ¼»¯/////////////////////
+  13   1              init_uart();
+  14   1              Delay2(1000);
+  15   1              if(K1==0)           //¿ª»úµÄÊ±ºò·¢ÏÖ°´¼ü1Ò²¾ÍÊÇMCU_P1.3 ±»°´ÏÂ£¬ÄÇÃ´Çå³ýµ¥Æ¬»úÖÐEEPROM´æµÄÊý¾Ý
+  16   1              {
+  17   2      
+  18   2                              LED2=0;
+  19   2                              BEEP=1;
+  20   2                              Delay2(200);
+  21   2                          LED2=1;
+  22   2                              BEEP=0;      //ÉÁÁÁÐÄÌøÖ¸Ê¾µÆ£¬ºÍÐÄÌøÒô
+  23   2                              have_config=1;
+  24   2              }
+  25   1      
+  26   1              ///////////////////////////////////////////////////////////////////////////////////ÒÔÉÏ²¿·ÖÖ÷ÒªÍê³É´®¿ÚµÄ
+             -³õÊ¼»¯////////////////////////////
+  27   1              for(;;)
+  28   1              {        
+  29   2              a_vec=0;                          //³öÏÖÖ¸¶¨µÄ×Ö´®£¬²¢¶¯Ì¬¹ýÂËµ½Ö¸¶¨µÄ×Ö·ûºó ÖÃ1
+  30   2              ceng=0;                   //×î¶à ¶àÉÙ×Ö½ÚÄÚ »á³öÏÖÖ¸¶¨×Ö´®,¾²Ì¬±äÁ¿£¬
+  31   2                      RX1_Cnt=0;
+  32   2              str_len_limt=11;          //ÉèÖÃÒ»¸öÏÞ¶¨²Î¿¼ÊýÖµ£¬ÔÚÕâ¸ö²Î¿¼¸öÊýÄÚ±Ø¶¨³öÏÖÖ¸¶¨×Ö·û´®
+  33   2              str_len_num=8;           //Òª¹ýÂËÁ¬Ðø×Ö·û¸öÊý
+  34   2              str_ref='I';                      // ¹ýÂËµ½×Ö·û´®ºó£¬½Ó×ÅÒª³öÏÖµÄ×Ö·û£¬Õâ¸ö×Ö·û³öÏÖµÄÎ»ÖÃ²ÅÊÇ¾ø¶Ô0Î»ÖÃ
+  35   2                      uart_rec_sta=uart_rec_smartlink; //ÉèÖÃÔÚ´®¿ÚÖÐµÄ¹ýÂË·ÖÖ§Ìõ¼þ£¬´®¿ÚÖÐ¶ÏÖÐ£¬¸ù¾ÝÕâ¸ö±êÖ¾µ÷ÓÃ²»Í¬µÄ×Ö·û´®¹
+             -ýÂË²ÎÊý
+  36   2              //////////////////////////ÒÔÉÏ±äÁ¿Îª×Ö·û´®¹ýÂË²ÎÊý£¬ÉèÖÃ¹ýÂËÌõ¼þ/////////////////////////////////////////
+             -//////////////////////////////////
+  37   2                      at_uart_send_str(AT_MODE);               //ÉèÖÃÄ£¿é½øÈëSTATION Ä£Ê½
+  38   2                      Delay2(500);
+  39   2                      if(have_config)                                  //ÐèÒªÅäÖÃ Ä£¿éÁ¬Èë±¾µØµÄÂ·ÓÉÆ÷ÕË»§ºÍÃÜÂë
+  40   2                      {
+  41   3                      at_uart_send_str(AT_SMARTLINK);  //·¢ËÍ½øÈëSMARTLINK ATÖ¸Áî
+  42   3                      Delay2(500);
+  43   3                      }
+  44   2                      do                                                               //´ËÑ­»·Íê³ÉSMARTLINK µÄÅäÖÃ
+  45   2                      {
+  46   3                      LED1=0;
+  47   3                      LED2=0;
+  48   3                      LED3=0;
+  49   3                      Delay2(500);
+  50   3                      LED1=1;
+C51 COMPILER V9.01   MAIN                                                                  06/26/2015 09:26:00 PAGE 2   
+
+  51   3                      LED2=1;
+  52   3                      LED3=1;
+  53   3                      Delay2(500);
+  54   3                  }while(have_smartlink==0); //´ËÑ­»·Íê³ÉSMARTLINK µÄÅäÖÃ
+  55   2                      //////////////////////////////////////////////////////////ÉÏÃæÃæµÄÓï¾ä·¢ËÍATÖ¸Áî¼ÓÈëÄÚÍø£¬²¢Á´½Óµ½°²ÐÅ¿É
+             -ÎïÁªÍø·þÎñÆ÷/////////////////////
+  56   2                      at_uart_send_str(AT_CLDSTART);
+  57   2                      a_vec=0;                          //³öÏÖÖ¸¶¨µÄ×Ö´®£¬²¢¶¯Ì¬¹ýÂËµ½Ö¸¶¨µÄ×Ö·ûºó ÖÃ1
+  58   2                      RX1_Cnt=0;                                //
+  59   2              ceng=0;                   //×î¶à ¶àÉÙ×Ö½ÚÄÚ »á³öÏÖÖ¸¶¨×Ö´®,¾²Ì¬±äÁ¿£¬
+  60   2              str_len_limt=12;          //ÉèÖÃÒ»¸öÏÞ¶¨²Î¿¼ÊýÖµ£¬ÔÚÕâ¸ö²Î¿¼¸öÊýÄÚ±Ø¶¨³öÏÖÖ¸¶¨×Ö·û´®
+  61   2              str_len_num=5;            //×Ö·û¸öÊý
+  62   2              str_ref=':';
+  63   2                      uart_rec_sta=uart_rmt_tcp_udp_data;                      //½«¹¹ÔìºÃµÄAT·¢ËÍÊý¾Ýµ½»¥ÁªÍøµÄ¶¯Ì¬·¢ËÍÊý¾Ý³¤¶
+             -È
+  64   2                      Delay2(1000);
+  65   2                      at_uart_send_str(AT_LANSTART);
+  66   2                      Delay2(500);
+  67   2                      while(1)
+  68   2                      {                                                                                                        //Ö÷Ñ­»·ÌåÖÐ£¬Ã¿30Ãë¹¹ÔìÒ»¸öÉÏ´«Êý¾Ý£¬ÉÏ´«Êý¾ÝÃ¿´Î¼Ó1. 
+  69   3                              for(tt=0;tt<120;tt++)
+  70   3                              {
+  71   4                              Delay2(100);
+  72   4                              if(led_data)
+  73   4                              {
+  74   5                                      led_data=0;
+  75   5                                      if(led_sta)
+  76   5                                      {
+  77   6                                              for(n=0;n<3;n++)
+  78   6                                              {
+  79   7                                                      need_seed_len=8;              //¹¹ÔìÉÏ´«Êý¾Ýµ½ÔÆ£¬×ª¸øÊÖ»úµÄÎÂ¶ÈÊý¾Ý°ü£¬·ûºÏ»ù±¾Êý¾Ý¸ñÊ½
+  80   7                                                  make_AT_SEND_LEN(need_seed_len,RMT_data);                                    //¶¯Ì¬¹¹Ôì·¢ËÍATÖ¸Áî
+  81   7                                                      at_uart_send_str(at_send_len_ox);                //·¢ËÍ¹¹ÔìºÃµÄ·¢ËÍÖ¸Áî
+  82   7                                                  Delay2(200);
+  83   7                                                  at_uart_send_buf(switch_sta1,need_seed_len);             //¾­¹ýWIFI·¢ËÍÊý¾Ý
+  84   7                                              }
+  85   6                                      }
+  86   5                                      else
+  87   5                                      {       
+  88   6                                                      for(n=0;n<3;n++)
+  89   6                                                      {
+  90   7                                                      need_seed_len=8;              //¹¹ÔìÉÏ´«Êý¾Ýµ½ÔÆ£¬×ª¸øÊÖ»úµÄÎÂ¶ÈÊý¾Ý°ü£¬·ûºÏ»ù±¾Êý¾Ý¸ñÊ½
+  91   7                                                  make_AT_SEND_LEN(need_seed_len,RMT_data);                                    //¶¯Ì¬¹¹Ôì·¢ËÍATÖ¸Áî
+  92   7                                                      at_uart_send_str(at_send_len_ox);                //·¢ËÍ¹¹ÔìºÃµÄ·¢ËÍÖ¸Áî
+  93   7                                                  Delay2(200);
+  94   7                                                  at_uart_send_buf(switch_sta0,need_seed_len);             //¾­¹ýWIFI·¢ËÍÊý¾Ý 
+  95   7                                                      }
+  96   6                                      }
+  97   5                              }
+  98   4                              Delay2(100);
+  99   4                          }
+ 100   3                          need_seed_len=9;                                 //¹¹ÔìÉÏ´«Êý¾Ýµ½ÔÆ£¬×ª¸øÊÖ»úµÄÎÂ¶ÈÊý¾Ý°ü£¬·ûºÏ»ù±¾Ê
+             -ý¾Ý¸ñÊ½
+ 101   3                          make_AT_SEND_LEN(need_seed_len,RMT_data);            //¶¯Ì¬¹¹Ôì·¢ËÍATÖ¸Áî
+ 102   3                              at_uart_send_str(at_send_len_ox);                //·¢ËÍ¹¹ÔìºÃµÄ·¢ËÍÖ¸Áî
+ 103   3                          Delay2(2000);
+ 104   3                          at_uart_send_buf(temp_cd,need_seed_len);         //¾­¹ýWIFI·¢ËÍÊý¾Ý
+ 105   3      
+ 106   3                              LED2=0;
+ 107   3                              BEEP=1;
+ 108   3                              Delay2(200);
+ 109   3                          LED2=1;
+C51 COMPILER V9.01   MAIN                                                                  06/26/2015 09:26:00 PAGE 3   
+
+ 110   3                              BEEP=0;                                          //ÉÁÁÁÐÄÌøÖ¸Ê¾µÆ£¬ºÍÐÄÌøÒô
+ 111   3                                                                                                                               //Ã¿30Ãë»áÔËÐÐµ½ÕâÀïÒ»´Î¡£¸üÐÂÒ»´ÎÎÂ¶ÈÊýÖµ
+ 112   3                              time++;
+ 113   3                              temp_cd[5]=(((time%1000)/100)+'0');
+ 114   3                              temp_cd[6]=(((time%100)/10)+'0');
+ 115   3                          temp_cd[7]=(((time%10))+'0');
+ 116   3                 }
+ 117   2              }
+ 118   1              Delay2(2000);
+ 119   1      }
+ 120          
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    507    ----
+   CONSTANT SIZE    =    441    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =     45       5
+   IDATA SIZE       =     96    ----
+   BIT SIZE         =     10    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)

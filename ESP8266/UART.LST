@@ -1,0 +1,158 @@
+C51 COMPILER V9.01   UART                                                                  06/26/2015 09:26:01 PAGE 1   
+
+
+C51 COMPILER V9.01, COMPILATION OF MODULE UART
+OBJECT MODULE PLACED IN UART.OBJ
+COMPILER INVOKED BY: C:\Keil\C51\BIN\C51.EXE UART.C OPTIMIZE(6,SPEED) BROWSE DEBUG OBJECTEXTEND
+
+line level    source
+
+   1          #include"UART.H"
+   2          #include"STC15FXXXX.H"
+   3          
+   4          /********************* 字符串过滤函数初始参数************************/
+   5          /*
+   6          bit a_vec=0;                      //出现指定的字串，并动态过滤到指定的字符后 置1
+   7          unsigned char ceng=0;         //最多 多少字节内 会出现指定字串,静态变量，
+   8          unsigned char str_len_limt=12;//设置一个限定参考数值，在这个参考个数内必定出现指定字符串
+   9          unsigned char str_len_num=5;  //字符个数
+  10          char str_ref=':';
+  11          code char test_code[]="+IPD,";
+  12          */
+  13          
+  14          void fit_stb(unsigned char *str_p) // 每次串口接收到一个字符都会进入本过滤函数，看是否过滤到指定的字符串。
+  15          {
+  16   1         if((a_vec==0)&&(ceng<str_len_limt))
+  17   1         {
+  18   2            if(ceng<str_len_num)
+  19   2                {
+  20   3            if(SBUF==(*(str_p+ceng)))
+  21   3                ceng++; 
+  22   3                else 
+  23   3                ceng=0;
+  24   3                }
+  25   2                else
+  26   2                {
+  27   3                      ceng++;
+  28   3                      if(SBUF==str_ref)
+  29   3                      {
+  30   4                        a_vec=1;
+  31   4                        ceng=0;       
+  32   4                      }
+  33   3                }
+  34   2                RX1_Cnt=0;
+  35   2         }
+  36   1         else if(ceng>=str_len_limt)
+  37   1         {
+  38   2                a_vec=0;
+  39   2                        ceng=0;
+  40   2         }
+  41   1      }
+  42          
+  43          void UART1_int (void) interrupt UART1_VECTOR
+  44          {
+  45   1              if(RI)
+  46   1              {
+  47   2                      RI = 0;
+  48   2                      if(a_vec==0)//上次未曾过滤到指定的字符串中所有的字符出现，每次只过滤一个字符
+  49   2                      {
+  50   3                       switch(uart_rec_sta)         //根据系统的状态，决定过滤哪个字符         
+  51   3                       {
+  52   4                        case uart_rmt_tcp_udp_data: //串口进入正常的UDP TCP 数据收发
+  53   4                        fit_stb(PCLD_code);             //过滤数据接收头
+  54   4                        break;
+  55   4                        case  uart_rec_csysid:          //串口进入获得模块内部ID 和KEY 状态
+C51 COMPILER V9.01   UART                                                                  06/26/2015 09:26:01 PAGE 2   
+
+  56   4                        fit_stb(CYSYS_code);        //过滤指定的头部
+  57   4                        break;
+  58   4                        case uart_rec_smartlink:        //串口进入获得客户的路由器账户密码状态
+  59   4                        fit_stb(smartlink_code);
+  60   4                        break;
+  61   4                        case uart_rec_bander:
+  62   4                        fit_stb(bander_code);
+  63   4                       }
+  64   3                      }
+  65   2                      else//////////////////////////////过滤到指定的头部
+  66   2                      {
+  67   3                      
+  68   3                       recd_buf[RX1_Cnt] = SBUF;              //保存一个字节
+  69   3                       if(RX1_Cnt<62) /////////////////////防止64字节的缓冲区溢出
+  70   3                       RX1_Cnt++;
+  71   3                       else                   ///////每次收到的指令超过64字节，就把数据清空，接收指针指向开头
+  72   3                       {
+  73   4                         RX1_Cnt=0;
+  74   4                         a_vec=0;
+  75   4                         two_lab=0;
+  76   4                       }
+  77   3                       switch(uart_rec_sta)
+  78   3                        {
+  79   4                          case  uart_rmt_tcp_udp_data:
+  80   4                                      if(RX1_Cnt>=7)
+  81   4                                       {
+  82   5                                         a_vec=0;
+  83   5                                         rec_len=RX1_Cnt;
+  84   5                                         two_lab=0;
+  85   5                                         RX1_Cnt=0;
+  86   5                         LED1=0;
+  87   5                                         LED2=0;
+  88   5                                         LED3=0;
+  89   5                                         //change_pack();
+  90   5                                         have_data=1;
+  91   5                                          if((recd_buf[5])==':')            /////////////////////////////////////简单得到手机的开关指令//////////
+             -//////////
+  92   5                                              {
+  93   6                                               if((recd_buf[6])=='0')
+  94   6                                               {
+  95   7                                                DK1=0;
+  96   7                                                LED1=1;         //关灯指令
+  97   7                                                led_sta=0;
+  98   7                                                led_data=1;
+  99   7                                               }
+ 100   6                                               else if((recd_buf[6])=='1')
+ 101   6                                               {
+ 102   7                                                DK1=1;
+ 103   7                                                led_sta=1;
+ 104   7                                            LED1=0;    //开灯指令
+ 105   7                                                led_data=1;
+ 106   7                                               }
+ 107   6                                              }
+ 108   5                                       }
+ 109   4                              break;
+ 110   4                         case  uart_rec_csysid:
+ 111   4                         if(RX1_Cnt>40)
+ 112   4                         have_id=1;
+ 113   4                         break;
+ 114   4                         case  uart_rec_smartlink:
+ 115   4                         //if(RX1_Cnt>10)
+ 116   4                         have_smartlink=1;
+C51 COMPILER V9.01   UART                                                                  06/26/2015 09:26:01 PAGE 3   
+
+ 117   4                         break;
+ 118   4                         case  uart_rec_bander:
+ 119   4                         if(RX1_Cnt>15)
+ 120   4                         have_bander=1;
+ 121   4                         break;
+ 122   4                       };
+ 123   3                }
+ 124   2              }
+ 125   1              if(TI)
+ 126   1              {
+ 127   2                      TI = 0;
+ 128   2                      B_TX1_Busy = 0;         //清除发送忙标志
+ 129   2              }
+ 130   1      }
+
+
+MODULE INFORMATION:   STATIC OVERLAYABLE
+   CODE SIZE        =    318    ----
+   CONSTANT SIZE    =   ----    ----
+   XDATA SIZE       =   ----    ----
+   PDATA SIZE       =   ----    ----
+   DATA SIZE        =   ----    ----
+   IDATA SIZE       =   ----    ----
+   BIT SIZE         =      2    ----
+END OF MODULE INFORMATION.
+
+
+C51 COMPILATION COMPLETE.  0 WARNING(S),  0 ERROR(S)
